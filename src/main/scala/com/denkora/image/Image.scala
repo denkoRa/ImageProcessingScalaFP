@@ -110,8 +110,8 @@ object Image {
 
   private def formatToExt(format: Int): String = {
     format match {
-      case pngFormat => "png"
-      case jpgFormat => "jpg"
+      case `pngFormat` => "png"
+      case `jpgFormat` => "jpg"
     }
   }
 
