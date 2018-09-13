@@ -10,5 +10,6 @@ Also, task includes working with layers of images, selections inside images etc.
 - [x] Median filter
 - [ ] WAM filter
 - [ ] Sequence of operations
+- [ ] More than 1 selection per image
 - [ ] Interactive Menus
 - [ ] Examples in README
