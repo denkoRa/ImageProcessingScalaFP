@@ -7,16 +7,23 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 /**
   * Created by denkoRa on 9/10/2018.
   */
-case class Layer(val img: Image, val opacity: Double) {
+case class Layer(img: Image, opacity: Double) {
   var active = true
 
   def activate = active = true
   def deactivate = active = false
+
+  def width = img.getWidth
+  def height = img.getHeight
+
+  def select(topLeft: (Int, Int), bottomRight: (Int, Int)): Unit = {
+    img.select(topLeft, bottomRight)
+  }
 }
 
 class NoActiveLayers extends Exception
 
-object Layer {
+object LayerFactory {
 
   var layers: ArrayBuffer[Layer] = ArrayBuffer[Layer]()
 

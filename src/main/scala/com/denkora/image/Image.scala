@@ -33,20 +33,22 @@ case class Image (img: BufferedImage) {
     res
   }
 
-  def select(topLeft: (Int, Int), bottomRight: (Int, Int)) {
-    selection = selection + Selection(topLeft, bottomRight)
+  def insideBounds(point: (Int, Int)): Boolean = {
+    point._1 < getWidth && point._1 >= 0 && point._2 < getHeight && point._2 >= 0
   }
 
-  def activate = activeSelection = true
-  def deactivate = activeSelection = false
+  def select(topLeft: (Int, Int), bottomRight: (Int, Int)) {
+    require(insideBounds(topLeft) && insideBounds(bottomRight), "Point out of bounds of image")
+    selection = selection + Selection(topLeft, bottomRight)
+    activateSelection
+  }
+
+  def activateSelection = activeSelection = true
+  def deactivateSelection = activeSelection = false
   def deleteSelection = selection = Selection()
 
   def selected = if (activeSelection) selection else Selection((0, 0), (w - 1, h - 1))
 
-//  def setPixel(i: Int, j: Int, pixel: Pixel) {
-//    pixels(i)(j) = pixel
-//  }
-//
   def getPixel(i: Int, j: Int): Pixel = {
     val r = (pixelMatrix(i)(j)(0) * 255).toInt
     val g = (pixelMatrix(i)(j)(1) * 255).toInt
@@ -57,12 +59,37 @@ case class Image (img: BufferedImage) {
 
   def applyOp(f: Double => Double, limit: Double => Double): Unit = {
     for (t <- selected.points) {
-      for (j <- 0 to 3) {
+      for (j <- 0 to 2) {
          pixelMatrix(t._1)(t._2)(j) = limit(f(pixelMatrix(t._1)(t._2)(j)))
       }
     }
   }
 
+  def applyGrayscale(): Unit = {
+    for (t <- selected.points) {
+      val v = (pixelMatrix(t._1)(t._2)(0) + pixelMatrix(t._1)(t._2)(0) + pixelMatrix(t._1)(t._2)(0)) / 3
+      for (j <- 0 to 2) {
+        pixelMatrix(t._1)(t._2)(j) = v
+      }
+    }
+  }
+
+  def applyFilter(filter: Array[Array[Double]] => Array[Array[Double]]): Unit = {
+    for (c <- 0 to 2)
+      setChannel(c, filter(getChannel(c)))
+  }
+
+  def setChannel(c: Int, m: Array[Array[Double]]): Unit = {
+    for(t <- selected.points)
+      pixelMatrix(t._1)(t._2)(c) = m(t._1)(t._2)
+  }
+
+  def getChannel(c: Int): Array[Array[Double]] = {
+    val res = Array.ofDim[Double](w, h)
+    for (i <- 0 until w; j <- 0 until h)
+        res(i)(j) = pixelMatrix(i)(j)(c)
+    res
+  }
 }
 
 object Image {

@@ -6,7 +6,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by denkoRa on 9/8/2018.
   */
-object Operation {
+object OperationManager {
   val add: (Double, Double) => Double = (x, y) => x + y
   val sub: (Double, Double) => Double = (x, y) => x - y
   val invsub: (Double, Double) => Double = (x, y) => y - x
@@ -22,10 +22,10 @@ object Operation {
   val inversion: (Double, Double) => Double = base(identity, invsub, 1.0)
 
   def base(g: (Double, Double) => Double, f: (Double, Double) => Double, c: Double): (Double, Double) => Double = {
-    def f(x: Double, y: Double): Double = {
+    def func(x: Double, y: Double): Double = {
       g(f(x, c), y)
     }
-    f
+    func
   }
 
   var ops: mutable.HashMap[String, (Double, Double) => Double] = mutable.HashMap()
@@ -60,19 +60,21 @@ object Operation {
     f
   }
 
-  def applyOpOnImage(name: String, c: Double, img: Image): Unit = {
-    img.applyOp(op(name, c), dontLimit)
+  def applyOp(name: String, img: Image, c: Double): Unit = {
+    name match {
+      case "grayscale" => img.applyGrayscale()
+      case _ => img.applyOp(op(name, c), limit)
+    }
   }
 
-  def applyOpOnLayers(name: String, c: Double, layers: ArrayBuffer[Layer]): Unit = {
+  def applyOp(name: String, layers: ArrayBuffer[Layer], c: Double = 0): Unit = {
     for (l <- layers)
-      applyOpOnImage(name, c, l.img)
+      applyOp(name, l.img, c)
   }
 
   def composeOp(compositionName: String, names: ArrayBuffer[String], consts: ArrayBuffer[Double]): Unit = {
-    //var comp_op: (Double, Double) => Double = (a, b) => a
     if (names.size == 1) {
-      var comp_op = base(identity, ops(names(0)), consts(0))
+      val comp_op = base(identity, ops(names(0)), consts(0))
       ops(compositionName) = comp_op
     } else {
       var comp_op = base(ops(names(1)), ops(names(0)), consts(0))
@@ -83,7 +85,6 @@ object Operation {
       ops(compositionName) = comp_op
     }
   }
-
 }
 
 
