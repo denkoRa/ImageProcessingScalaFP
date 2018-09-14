@@ -1,4 +1,6 @@
-package com.denkora.image
+package com.denkora.managers
+
+import com.denkora.image.{Image, Layer}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -19,16 +21,16 @@ object OperationManager {
   val min: (Double, Double) => Double = (x, y) => scala.math.min(x, y)
   val abs: (Double, Double) => Double = (x, y) => scala.math.abs(x)
   val identity: (Double, Double) => Double = (x, y) => x
-  val inversion: (Double, Double) => Double = base(identity, invsub, 1.0)
+  val inversion: (Double, Double) => Double = baseComposition(identity, invsub, 1.0)
 
-  def base(g: (Double, Double) => Double, f: (Double, Double) => Double, c: Double): (Double, Double) => Double = {
+  def baseComposition(g: (Double, Double) => Double, f: (Double, Double) => Double, c: Double): (Double, Double) => Double = {
     def func(x: Double, y: Double): Double = {
       g(f(x, c), y)
     }
     func
   }
 
-  var ops: mutable.HashMap[String, (Double, Double) => Double] = mutable.HashMap()
+  val ops: mutable.HashMap[String, (Double, Double) => Double] = mutable.HashMap()
 
   def listOps = {
     ops.keys.foreach {println}
@@ -61,10 +63,7 @@ object OperationManager {
   }
 
   def applyOp(name: String, img: Image, c: Double): Unit = {
-    name match {
-      case "grayscale" => img.applyGrayscale()
-      case _ => img.applyOp(op(name, c), limit)
-    }
+    img.applyOp(op(name, c), limit)
   }
 
   def applyOp(name: String, layers: ArrayBuffer[Layer], c: Double = 0): Unit = {
@@ -74,14 +73,14 @@ object OperationManager {
 
   def composeOp(compositionName: String, names: ArrayBuffer[String], consts: ArrayBuffer[Double]): Unit = {
     if (names.size == 1) {
-      val comp_op = base(identity, ops(names(0)), consts(0))
+      val comp_op = baseComposition(identity, ops(names(0)), consts(0))
       ops(compositionName) = comp_op
     } else {
-      var comp_op = base(ops(names(1)), ops(names(0)), consts(0))
+      var comp_op = baseComposition(ops(names(1)), ops(names(0)), consts(0))
       for (i <- 2 until names.size) {
-        comp_op = base(ops(names(i)), comp_op, consts(i - 1))
+        comp_op = baseComposition(ops(names(i)), comp_op, consts(i - 1))
       }
-      comp_op = base(identity, comp_op, consts(names.size - 1))
+      comp_op = baseComposition(identity, comp_op, consts(names.size - 1))
       ops(compositionName) = comp_op
     }
   }

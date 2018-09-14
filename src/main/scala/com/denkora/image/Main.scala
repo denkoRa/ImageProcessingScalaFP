@@ -1,5 +1,7 @@
 package com.denkora.image
 
+import com.denkora.managers.{FilterManager, OperationManager}
+
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -37,9 +39,14 @@ object Main extends App {
 
     val f = FilterManager
     val img = Image("testimg.jpg")
-    f.applyFilter("median", img, 5)
+    //f.applyFilter("median", img, 5)
+    img.select((300, 300), (500, 500))
+    f.applyFilter("fill", img, 0, Some(RGBColor(200, 200, 0)))
+    img.deactivateSelection
+    f.applyFilter("grayscale", img)
     Image.save(img, "result.png")
-//    val mat = Array.tabulate[Double](10, 10)((r, c) => r + c)
+
+  //    val mat = Array.tabulate[Double](10, 10)((r, c) => r + c)
 //    for (i <- 0 until mat.length) {
 //      println(mat(i).mkString(" "))
 //    }

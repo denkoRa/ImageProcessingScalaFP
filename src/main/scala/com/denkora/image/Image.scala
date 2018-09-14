@@ -13,7 +13,7 @@ case class Image (img: BufferedImage) {
   private var activeSelection = false
   def getWidth = w
   def getHeight = h
-  var pixelMatrix = Array.ofDim[Double](w, h, 4)
+  val pixelMatrix = Array.ofDim[Double](w, h, 4)
 
   for (i <- 0 until w)
     for (j <- 0 until h) {
@@ -65,23 +65,15 @@ case class Image (img: BufferedImage) {
     }
   }
 
-  def applyGrayscale(): Unit = {
-    for (t <- selected.points) {
-      val v = (pixelMatrix(t._1)(t._2)(0) + pixelMatrix(t._1)(t._2)(0) + pixelMatrix(t._1)(t._2)(0)) / 3
-      for (j <- 0 to 2) {
-        pixelMatrix(t._1)(t._2)(j) = v
-      }
-    }
-  }
-
-  def applyFilter(filter: Array[Array[Double]] => Array[Array[Double]]): Unit = {
+  def applyFilter(filter: Array[Array[Array[Double]]] => Array[Array[Array[Double]]]): Unit = {
+    val newPixelMatrix = filter(pixelMatrix)
     for (c <- 0 to 2)
-      setChannel(c, filter(getChannel(c)))
+      setChannel(c, newPixelMatrix)
   }
 
-  def setChannel(c: Int, m: Array[Array[Double]]): Unit = {
+  def setChannel(c: Int, m: Array[Array[Array[Double]]]): Unit = {
     for(t <- selected.points)
-      pixelMatrix(t._1)(t._2)(c) = m(t._1)(t._2)
+      pixelMatrix(t._1)(t._2)(c) = m(t._1)(t._2)(c)
   }
 
   def getChannel(c: Int): Array[Array[Double]] = {

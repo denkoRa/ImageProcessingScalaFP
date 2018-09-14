@@ -25,7 +25,7 @@ class NoActiveLayers extends Exception
 
 object LayerFactory {
 
-  var layers: ArrayBuffer[Layer] = ArrayBuffer[Layer]()
+  val layers: ArrayBuffer[Layer] = ArrayBuffer[Layer]()
 
   def apply(path: String, opacity: Double) : Layer = {
     val l = Layer(Image(path), opacity)
