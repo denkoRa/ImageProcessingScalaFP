@@ -7,6 +7,7 @@ Also, task includes working with layers of images, selections inside images etc.
 ## TODO
 - [x] Basic ops
 - [x] Composite ops
+- [ ] Fill Color
 - [x] Median filter
 - [ ] WAM filter
 - [ ] Sequence of operations
