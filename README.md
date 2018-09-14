@@ -7,9 +7,11 @@ Also, task includes working with layers of images, selections inside images etc.
 ## TODO
 - [x] Basic ops
 - [x] Composite ops
-- [ ] Fill Color
+- [X] Fill Color
 - [x] Median filter
-- [ ] WAM filter
+- [X] WAM filter
+- [X] Greyscale
+- [ ] Test WAM filter
 - [ ] Sequence of operations
 - [ ] More than 1 selection per image
 - [ ] Interactive Menus
