@@ -11,8 +11,8 @@ Also, task includes working with layers of images, selections inside images etc.
 - [x] Median filter
 - [X] WAM filter
 - [X] Greyscale
-- [ ] Test WAM filter
-- [ ] Sequence of operations
-- [ ] More than 1 selection per image
+- [X] Test WAM filter
+- [X] Sequence of operations
+- [X] More than 1 selection per image
 - [ ] Interactive Menus
 - [ ] Examples in README
