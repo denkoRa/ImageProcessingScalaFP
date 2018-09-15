@@ -8,7 +8,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by denkoRa on 9/8/2018.
   */
-object OperationManager {
+object OperationManager extends Manager {
   val add: (Double, Double) => Double = (x, y) => x + y
   val sub: (Double, Double) => Double = (x, y) => x - y
   val invsub: (Double, Double) => Double = (x, y) => y - x
@@ -31,8 +31,9 @@ object OperationManager {
   }
 
   val ops: mutable.HashMap[String, (Double, Double) => Double] = mutable.HashMap()
+  val sequenceOps: mutable.HashMap[String, ArrayBuffer[Double => Double]] = mutable.HashMap()
 
-  def listOps = {
+  def listOps(): Unit = {
     ops.keys.foreach {println}
   }
 
@@ -54,6 +55,7 @@ object OperationManager {
   ops("min") = min
   ops("abs") = abs
   ops("inversion") = inversion
+  ops("identity") = identity
 
   def op(name: String, const: Double): Double => Double = {
     def f(param: Double): Double = {
@@ -62,13 +64,17 @@ object OperationManager {
     f
   }
 
-  def applyOp(name: String, img: Image, c: Double): Unit = {
-    img.applyOp(op(name, c), limit)
+  private def applyOp(name: String, img: Image, c: Double): Unit = {
+    img.applyOp(op(name, c), limit, getSelection())
   }
 
   def applyOp(name: String, layers: ArrayBuffer[Layer], c: Double = 0): Unit = {
     for (l <- layers)
       applyOp(name, l.img, c)
+  }
+
+  def applyOp(name: String, layer: Layer, c: Double): Unit ={
+    applyOp(name, layer.img, c)
   }
 
   def composeOp(compositionName: String, names: ArrayBuffer[String], consts: ArrayBuffer[Double]): Unit = {
@@ -83,6 +89,26 @@ object OperationManager {
       comp_op = baseComposition(identity, comp_op, consts(names.size - 1))
       ops(compositionName) = comp_op
     }
+  }
+
+  def sequenceOp(sequenceName: String, names: ArrayBuffer[String], consts: ArrayBuffer[Double]): Unit = {
+    sequenceOps(sequenceName) = for ((n, c) <- names zip consts) yield op(n, c)
+  }
+
+  private def applySequence(sequenceName: String, img: Image): Unit = {
+    for (op <- sequenceOps(sequenceName)) {
+      img.applyOp(op, dontLimit, getSelection())
+    }
+    img.applyOp(op("identity", 0), limit, getSelection())
+  }
+
+  def applySequence(sequenceName: String, layers: ArrayBuffer[Layer]): Unit = {
+    for (l <- layers)
+      applySequence(sequenceName, l.img)
+  }
+
+  def applySequence(sequenceName: String, layer: Layer): Unit ={
+    applySequence(sequenceName, layer.img)
   }
 }
 

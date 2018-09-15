@@ -9,10 +9,8 @@ import scala.util.matching.Regex
 case class Image (img: BufferedImage) {
   private val w = img.getWidth
   private val h = img.getHeight
-  private var selection: Selection = Selection()
-  private var activeSelection = false
-  def getWidth = w
-  def getHeight = h
+  def getWidth: Int = w
+  def getHeight: Int = h
   val pixelMatrix = Array.ofDim[Double](w, h, 4)
 
   for (i <- 0 until w)
@@ -37,18 +35,6 @@ case class Image (img: BufferedImage) {
     point._1 < getWidth && point._1 >= 0 && point._2 < getHeight && point._2 >= 0
   }
 
-  def select(topLeft: (Int, Int), bottomRight: (Int, Int)) {
-    require(insideBounds(topLeft) && insideBounds(bottomRight), "Point out of bounds of image")
-    selection = selection + Selection(topLeft, bottomRight)
-    activateSelection
-  }
-
-  def activateSelection = activeSelection = true
-  def deactivateSelection = activeSelection = false
-  def deleteSelection = selection = Selection()
-
-  def selected = if (activeSelection) selection else Selection((0, 0), (w - 1, h - 1))
-
   def getPixel(i: Int, j: Int): Pixel = {
     val r = (pixelMatrix(i)(j)(0) * 255).toInt
     val g = (pixelMatrix(i)(j)(1) * 255).toInt
@@ -57,22 +43,24 @@ case class Image (img: BufferedImage) {
     Pixel(r, g, b, a)
   }
 
-  def applyOp(f: Double => Double, limit: Double => Double): Unit = {
-    for (t <- selected.points) {
+  def applyOp(f: Double => Double, limit: Double => Double, selected: Option[Selection]): Unit = {
+    val sel = selected.getOrElse(SelectionFactory("", (0,0), (w - 1, h - 1)))
+    for (t <- sel.points; if insideBounds(t)) {
       for (j <- 0 to 2) {
-         pixelMatrix(t._1)(t._2)(j) = limit(f(pixelMatrix(t._1)(t._2)(j)))
+        pixelMatrix(t._1)(t._2)(j) = limit(f(pixelMatrix(t._1)(t._2)(j)))
       }
     }
   }
 
-  def applyFilter(filter: Array[Array[Array[Double]]] => Array[Array[Array[Double]]]): Unit = {
+  def applyFilter(filter: Array[Array[Array[Double]]] => Array[Array[Array[Double]]], selected: Option[Selection]): Unit = {
     val newPixelMatrix = filter(pixelMatrix)
+    val sel = selected.getOrElse(SelectionFactory("", (0,0), (w - 1, h - 1)))
     for (c <- 0 to 2)
-      setChannel(c, newPixelMatrix)
+      setChannel(c, newPixelMatrix, sel)
   }
 
-  def setChannel(c: Int, m: Array[Array[Array[Double]]]): Unit = {
-    for(t <- selected.points)
+  def setChannel(c: Int, m: Array[Array[Array[Double]]], selected: Selection): Unit = {
+    for(t <- selected.points; if insideBounds(t))
       pixelMatrix(t._1)(t._2)(c) = m(t._1)(t._2)(c)
   }
 

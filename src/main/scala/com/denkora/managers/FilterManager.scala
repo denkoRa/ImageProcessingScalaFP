@@ -1,6 +1,6 @@
 package com.denkora.managers
 
-import com.denkora.image.{Color, Image, RGBColor}
+import com.denkora.image.{Color, Image, Layer, RGBColor}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -8,9 +8,14 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by denkoRa on 9/13/2018.
   */
-object FilterManager {
+object FilterManager extends Manager {
   var filters: mutable.HashMap[String, (Array[Array[Double]]) => Array[Array[Double]]] = mutable.HashMap()
   var weights: Array[Array[Double]] = _
+  var dist: Int = 0
+
+  def setDist(d: Int): Unit = {
+    dist = d
+  }
 
   def setWeights(w: Array[Array[Double]]): Unit ={
     weights = w
@@ -50,7 +55,7 @@ object FilterManager {
       var cnt = 0
       for (x <- scala.math.max(0, i - dist) to scala.math.min(w - 1, i + dist);
            y <- scala.math.max(0, j - dist) to scala.math.min(h - 1, j + dist)) {
-        neighbourSum += m(x)(y)(c) * weights(x - i + dist)(y - j + dist)
+        neighbourSum += m(x)(y)(c) * weights(y - j + dist)(x - i + dist)
         cnt += 1
       }
       res(i)(j)(c) = 1.0 * neighbourSum / cnt
@@ -81,20 +86,42 @@ object FilterManager {
     res
   }
 
-  def filter(name: String, d: Int, c: RGBColor): (Array[Array[Array[Double]]]) => Array[Array[Array[Double]]] = {
+  def filter(name: String, c: RGBColor): (Array[Array[Array[Double]]]) => Array[Array[Array[Double]]] = {
     def f(m: Array[Array[Array[Double]]]): Array[Array[Array[Double]]] = {
       name match {
         case "fill" => fill(m, c)
         case "grayscale" => grayscale(m)
-        case "median" => median(m, d)
-        case "wam" => wam(m, d, weights)
+        case "median" => median(m, dist)
+        case "wam" => wam(m, dist, weights)
       }
     }
     f
   }
 
-  def applyFilter(name: String, img: Image, d: Int = 0, c: Option[RGBColor] = None): Unit = {
-    img.applyFilter(filter(name, d, c.getOrElse(Color.Transparent)))
+  private def fillColor(img: Image, c: RGBColor): Unit = {
+    img.applyFilter(filter("fill", c), getSelection())
+  }
+
+  def fillColor(layer: Layer, c: RGBColor): Unit = {
+    fillColor(layer.img, c)
+  }
+
+  def fillColor(layers: ArrayBuffer[Layer], c: RGBColor): Unit = {
+    for (l <- layers)
+      fillColor(l.img, c)
+  }
+
+  private def applyFilter(name: String, img: Image): Unit = {
+    img.applyFilter(filter(name, Color.Transparent), getSelection())
+  }
+
+  def applyFilter(name: String, layer: Layer): Unit = {
+    applyFilter(name, layer.img)
+  }
+
+  def applyFilter(name: String, layers: ArrayBuffer[Layer]): Unit = {
+    for (l <- layers)
+      applyFilter(name, l.img)
   }
 
 }

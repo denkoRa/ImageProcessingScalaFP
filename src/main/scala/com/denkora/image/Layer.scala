@@ -7,7 +7,7 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 /**
   * Created by denkoRa on 9/10/2018.
   */
-case class Layer(img: Image, opacity: Double) {
+case class Layer(img: Image, var opacity: Double) {
   var active = true
 
   def activate = active = true
@@ -16,8 +16,8 @@ case class Layer(img: Image, opacity: Double) {
   def width = img.getWidth
   def height = img.getHeight
 
-  def select(topLeft: (Int, Int), bottomRight: (Int, Int)): Unit = {
-    img.select(topLeft, bottomRight)
+  def setOpacity(o: Double): Unit = {
+    opacity = o
   }
 }
 
@@ -43,7 +43,7 @@ object LayerFactory {
     layers(ind - 1).activate
   }
 
-  def joinLayers(): Image = {
+  def mergeLayers(): Image = {
     if (layers.find(p => p.active).isEmpty)
       throw new NoActiveLayers
     val end = layers.size - 1
