@@ -1,5 +1,7 @@
 package com.denkora.image
 
+import com.denkora.exceptions.KeyNotFoundException
+
 import scala.collection.mutable.{ArrayBuffer, HashSet}
 import scala.collection.mutable
 
@@ -17,7 +19,9 @@ case class Selection(points: HashSet[(Int, Int)] = mutable.HashSet()) {
     active = false
   }
 
-  override def toString: String = points.toString
+  override def toString: String = {
+    active.toString
+  }
 }
 
 object SelectionFactory {
@@ -33,20 +37,27 @@ object SelectionFactory {
   }
 
   def activateSelection(name: String): Unit = {
+    if (!selections.contains(name)) throw new KeyNotFoundException
     selections(name).activate()
   }
 
   def deactivateSelection(name: String): Unit = {
+    if (!selections.contains(name)) throw new KeyNotFoundException
     selections(name).deactivate()
   }
 
-  def deleteSelection(name: String): Unit ={
+  def deleteSelection(name: String): Unit = {
+    if (!selections.contains(name)) throw new KeyNotFoundException
     selections -= name
   }
 
-  def mergeSelections(): Selection = {
-    var hs: HashSet[(Int, Int)] = mutable.HashSet()
-    selections foreach (x => if (x._2.active) hs = hs ++ x._2.points)
-    Selection(hs)
+  def listSelections(): Unit = {
+    for (x <- selections) {
+      println(x)
+    }
+  }
+
+  def getSelections(): Iterable[Selection] = {
+    selections.values
   }
 }

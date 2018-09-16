@@ -6,13 +6,6 @@ package com.denkora.image
 trait Color {
   def toRGB: RGBColor
 
-  def toHex: String = Integer.toHexString(toRGB.toInt & 0xffffff).toUpperCase.reverse.padTo(6, '0').reverse
-
-  def toAWT: java.awt.Color = {
-    val rgb = toRGB
-    new java.awt.Color(rgb.red, rgb.green, rgb.blue, rgb.alpha)
-  }
-
   def toPixel: Pixel = {
     val rgb = toRGB
     Pixel(rgb.red, rgb.green, rgb.blue, rgb.alpha)

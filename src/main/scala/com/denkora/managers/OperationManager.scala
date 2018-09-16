@@ -96,10 +96,13 @@ object OperationManager extends Manager {
   }
 
   private def applySequence(sequenceName: String, img: Image): Unit = {
+    val sel = getSelection()
+    println(sequenceOps(sequenceName))
     for (op <- sequenceOps(sequenceName)) {
-      img.applyOp(op, dontLimit, getSelection())
+      println(op.toString())
+      img.applyOp(op, dontLimit, sel)
     }
-    img.applyOp(op("identity", 0), limit, getSelection())
+    img.applyOp(op("identity", 0), limit, sel)
   }
 
   def applySequence(sequenceName: String, layers: ArrayBuffer[Layer]): Unit = {

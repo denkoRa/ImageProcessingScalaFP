@@ -1,13 +1,16 @@
 package com.denkora.image
 
 import java.awt.image.BufferedImage
+import java.nio.file.{Path, Paths}
+
+import com.denkora.exceptions.{IndexException, NoActiveException, ValueException}
 
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
   * Created by denkoRa on 9/10/2018.
   */
-case class Layer(img: Image, var opacity: Double) {
+case class Layer(path: String, ind: Int, img: Image, var opacity: Double) {
   var active = true
 
   def activate = active = true
@@ -19,33 +22,43 @@ case class Layer(img: Image, var opacity: Double) {
   def setOpacity(o: Double): Unit = {
     opacity = o
   }
-}
 
-class NoActiveLayers extends Exception
+  override def toString: String = {
+    ind.toString + ". " + path + " " + active.toString + " " + opacity.toString
+  }
+}
 
 object LayerFactory {
 
   val layers: ArrayBuffer[Layer] = ArrayBuffer[Layer]()
 
   def apply(path: String, opacity: Double) : Layer = {
-    val l = Layer(Image(path), opacity)
+    val l = Layer(path, layers.size, Image(path), opacity)
     layers += l
     l
   }
 
   def n = layers.size
 
+  def setOpacity(ind: Int, opacity: Double): Unit = {
+    if (ind > n) throw new IndexException
+    if (opacity > 1 || opacity < 0) throw new ValueException
+    layers(ind - 1).setOpacity(opacity)
+  }
+
   def deactivateLayer(ind: Int) {
+    require(ind <= n)
     layers(ind - 1).deactivate
   }
 
   def activateLayer(ind: Int) {
+    require(ind <= n)
     layers(ind - 1).activate
   }
 
-  def mergeLayers(): Image = {
+  def mergeLayers(fname: String): Image = {
     if (layers.find(p => p.active).isEmpty)
-      throw new NoActiveLayers
+      throw new NoActiveException
     val end = layers.size - 1
     val lastImg = layers(end).img
     val w = lastImg.getWidth
@@ -59,7 +72,14 @@ object LayerFactory {
             pixels(j)(k) = pixels(j)(k) * (1 - layers(i).opacity) + layers(i).img.getPixel(j, k) * layers(i).opacity
       }
     }
-    Image(pixels, w, h)
+    val img = Image(pixels, w, h)
+    Image.save(img, fname)
+    img
+  }
+
+  def listLayers(): Unit = {
+    for (l <- layers)
+      println(l.toString)
   }
 
 }

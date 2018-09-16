@@ -9,7 +9,6 @@ import scala.collection.mutable.ArrayBuffer
   * Created by denkoRa on 9/13/2018.
   */
 object FilterManager extends Manager {
-  var filters: mutable.HashMap[String, (Array[Array[Double]]) => Array[Array[Double]]] = mutable.HashMap()
   var weights: Array[Array[Double]] = _
   var dist: Int = 0
 
