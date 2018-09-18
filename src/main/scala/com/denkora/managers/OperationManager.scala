@@ -23,6 +23,8 @@ object OperationManager extends Manager {
   val identity: (Double, Double) => Double = (x, y) => x
   val inversion: (Double, Double) => Double = baseComposition(identity, invsub, 1.0)
 
+  val basicOps: Set[String] = Set("add", "sub", "invsub", "mul", "div", "invdiv", "power", "max", "min")
+
   def baseComposition(g: (Double, Double) => Double, f: (Double, Double) => Double, c: Double): (Double, Double) => Double = {
     def func(x: Double, y: Double): Double = {
       g(f(x, c), y)

@@ -24,7 +24,7 @@ case class Layer(path: String, ind: Int, img: Image, var opacity: Double) {
   }
 
   override def toString: String = {
-    ind.toString + ". " + path + " " + active.toString + " " + opacity.toString
+    path + " " + active.toString + " " + opacity.toString
   }
 }
 
@@ -78,8 +78,11 @@ object LayerFactory {
   }
 
   def listLayers(): Unit = {
-    for (l <- layers)
-      println(l.toString)
+    var c = 1
+    for (l <- layers) {
+      println(c.toString + ". " + l.toString)
+      c += 1
+    }
   }
 
 }

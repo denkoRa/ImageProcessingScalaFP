@@ -11,13 +11,26 @@ import scala.collection.mutable.ArrayBuffer
 object FilterManager extends Manager {
   var weights: Array[Array[Double]] = _
   var dist: Int = 0
+  val filters: Set[String] = Set("median", "wam", "grayscale", "fill")
+
+  def listFilters(): Unit = {
+    filters foreach {println}
+  }
 
   def setDist(d: Int): Unit = {
     dist = d
   }
 
+  def getDist(): Int = {
+    dist
+  }
+
   def setWeights(w: Array[Array[Double]]): Unit ={
     weights = w
+  }
+
+  def getWeights(): Array[Array[Double]] = {
+    weights
   }
 
   def medianOfArray(seq: Seq[Double]): Double = {
