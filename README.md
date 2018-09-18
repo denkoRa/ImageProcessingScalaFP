@@ -14,5 +14,5 @@ Also, task includes working with layers of images, selections inside images etc.
 - [X] Test WAM filter
 - [X] Sequence of operations
 - [X] More than 1 selection per image
-- [ ] Interactive Menus
+- [X] Interactive Menus
 - [ ] Examples in README
