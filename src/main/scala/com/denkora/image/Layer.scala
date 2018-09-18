@@ -56,19 +56,33 @@ object LayerFactory {
     layers(ind - 1).activate
   }
 
+  def maxW(): Int = {
+    var ret = 0
+    for (l <- layers; if l.active)
+      ret = scala.math.max(ret, l.width)
+    ret
+  }
+
+  def maxH(): Int = {
+    var ret = 0
+    for (l <- layers; if l.active)
+      ret = scala.math.max(ret, l.height)
+    ret
+  }
+
   def mergeLayers(fname: String): Image = {
     if (layers.find(p => p.active).isEmpty)
       throw new NoActiveException
     val end = layers.size - 1
     val lastImg = layers(end).img
-    val w = lastImg.getWidth
-    val h = lastImg.getHeight
+    val w = maxW()
+    val h = maxH()
     val pixels = Array.fill[Pixel](w, h)(Pixel())
 
     for (i <- end to 0 by -1) {
       if (layers(i).active) {
-        for (j <- 0 until w)
-          for (k <- 0 until h)
+        for (j <- 0 until layers(i).width)
+          for (k <- 0 until layers(i).height)
             pixels(j)(k) = pixels(j)(k) * (1 - layers(i).opacity) + layers(i).img.getPixel(j, k) * layers(i).opacity
       }
     }
