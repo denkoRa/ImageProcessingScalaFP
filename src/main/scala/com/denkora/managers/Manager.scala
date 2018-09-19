@@ -1,6 +1,8 @@
 package com.denkora.managers
 
+import com.denkora.app.Menus
 import com.denkora.image.Selection
+
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, HashSet}
 
@@ -15,6 +17,7 @@ trait Manager {
   }
 
   def getSelection(): Option[Selection] = {
+    selected = Menus.sf.getSelections()
     if (selected.count(s => s.active) > 0) Some(mergeSelections()) else None
   }
 
