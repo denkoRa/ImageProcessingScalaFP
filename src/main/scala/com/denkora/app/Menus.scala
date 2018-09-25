@@ -168,7 +168,7 @@ object Menus {
       for (name <- opNames) {
         var d = 0.0
         if (om.basicOps.contains(name)) {
-          println("Enter constant (Double) for operation " + name + " (if not necessary just type anything)")
+          println("Enter constant (Double) for operation " + name)
           d = try {
             scala.io.StdIn.readDouble()
           } catch {
@@ -185,7 +185,12 @@ object Menus {
     try {
       val opt = scala.io.StdIn.readInt()
       opt match {
-        case 1 => om.listOps()
+        case 1 => {
+          println("Operations:")
+          om.listOps()
+          println("Sequences of operations:")
+          om.listSeqOps()
+        }
         case 2 => {
           val par = readManyOps("composite operation")
           om.composeOp(par._1, par._2, par._3)

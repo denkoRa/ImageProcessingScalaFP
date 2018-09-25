@@ -39,6 +39,10 @@ object OperationManager extends Manager {
     ops.keys.foreach {println}
   }
 
+  def listSeqOps(): Unit = {
+    sequenceOps.keys.foreach {println}
+  }
+
   def limit(v: Double): Double = {
     scala.math.max(scala.math.min(v, 1), 0)
   }
@@ -99,9 +103,7 @@ object OperationManager extends Manager {
 
   private def applySequence(sequenceName: String, img: Image): Unit = {
     val sel = getSelection()
-    println(sequenceOps(sequenceName))
     for (op <- sequenceOps(sequenceName)) {
-      println(op.toString())
       img.applyOp(op, dontLimit, sel)
     }
     img.applyOp(op("identity", 0), limit, sel)

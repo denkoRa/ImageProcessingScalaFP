@@ -58,6 +58,6 @@ object SelectionFactory {
   }
 
   def getSelections(): Iterable[Selection] = {
-    selections.values
+    for (s <- selections; if s._1.size > 0) yield s._2
   }
 }

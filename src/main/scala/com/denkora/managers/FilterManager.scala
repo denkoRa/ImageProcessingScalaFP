@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
   * Created by denkoRa on 9/13/2018.
   */
 object FilterManager extends Manager {
-  var weights: Array[Array[Double]] = _
+  var weights: Array[Array[Double]] = Array.ofDim[Double](1, 1)
   var dist: Int = 0
   val filters: Set[String] = Set("median", "wam", "grayscale", "fill")
 
